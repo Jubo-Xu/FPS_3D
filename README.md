@@ -9,9 +9,9 @@ Two ways to make a first-person shooter in Python, from the same folder.
 
 ### The ursina project files
 - **`main.py`** — the file you run. Wires everything together and starts the game.
-- **`config.py`** — every tweakable number (speed, gun, map...) in one place.
-- **`entities.py`** — the `Player`, `Gun`, `Bullet`, `Crosshair` classes.
-- **`world.py`** — builds the level (ground, blocks, sky).
+- **`config.py`** — every tweakable number (speed, gun, ammo, enemies, map...) in one place.
+- **`entities.py`** — the `Enemy`, `Bullet`, `Gun`, `Player`, `Crosshair`, `HUD` classes.
+- **`world.py`** — builds the level (`build_world`) and places the enemies (`spawn_enemies`).
 
 ## Suggested lesson order
 1. **Run the ursina game (`main.py`) first** to get the student excited — it looks like a baby Roblox.
@@ -35,7 +35,45 @@ python main.py
 ## Controls
 
 **raycaster.py** — W/S move, A/D turn, Q/E strafe, ESC quit
-**ursina game (`main.py`)** — mouse look, WASD move, Space jump, Left-click shoot, ESC quit
+**ursina game (`main.py`)** — mouse look, WASD move, Space jump, Left-click shoot, **R reload**, right-click aim, scroll wheel zoom, ESC quit
+
+> The **arrow keys** also turn the view (`config.KEYBOARD_LOOK`). If your
+> mouse can't turn the view at all — some WSL setups can't capture the
+> cursor — set `config.MOUSE_LOOK = False` and use the arrow keys.
+
+## The goal of the game
+Six red blocks hunt you. Shoot each one three times to kill it; if one gets
+next to you it hits you once a second. Kill them all to win — the HUD counts
+them down in the top-left corner.
+
+Your magazine holds 12 bullets, and an enemy takes 3, so you *will* have to
+reload mid-fight. The blocks on the map stop the enemies walking at you, so
+use them as cover while you reload.
+
+## Reloading
+```python
+MAG_SIZE = 12        # bullets in a magazine
+RESERVE_AMMO = 60    # spare bullets you carry
+RELOAD_TIME = 1.2    # seconds you are helpless for
+AUTO_RELOAD = True   # clicking an empty gun reloads by itself
+INFINITE_AMMO = False
+```
+The HUD shows `magazine / reserve` bottom-right, turning red when empty, with
+`RELOADING...` above it while the timer runs.
+
+## Enemies
+Everything about them is in `config.py` under `# ----- Enemies -----`:
+```python
+ENEMY_SPOTS = [(8, 9), (-8, 10), ...]   # where they start — add more!
+ENEMY_HEALTH = 3                        # bullets needed to kill one
+ENEMY_SPEED = 2                         # slower than you (PLAYER_SPEED = 5)
+ENEMY_DAMAGE = 10                       # health you lose per hit
+ENEMY_SIGHT_RANGE = 20                  # how close before it notices you
+```
+How it fits together: a `Bullet` checks its flight path each frame, and if it
+hits an `Enemy` it calls `enemy.take_damage()`. At 0 health the enemy calls
+`player.add_score()` and deletes itself. The `HUD` never decides anything — it
+just reads the player and the enemy list every frame and draws what it sees.
 
 ## Switching the gun
 The ursina game ships with **two guns**. Open `config.py` and change one line:
@@ -45,7 +83,9 @@ GUN_TYPE = "boxes"   # a gun built by hand from cubes
 ```
 
 ## Sound
-Clicking to shoot plays `shoot.wav` (a generated laser "pew"). Controlled in `config.py`:
+Four generated sound files: `shoot.wav` (laser "pew"), `reload.wav` (two
+clacks), `empty.wav` (the click of an empty gun) and `hit.wav` (the ping when
+you hit an enemy). Controlled in `config.py`:
 ```python
 SOUND_ON = True       # turn all sound off/on
 SHOOT_VOLUME = 0.5    # 0.0 to 1.0
@@ -61,12 +101,16 @@ In `raycaster.py`:
 
 In the ursina game — **everything fun to change lives in `config.py`**:
 - Add more entries to `BLOCK_SPOTS` to build a bigger map.
+- Add more entries to `ENEMY_SPOTS` to make a harder fight.
 - Change `BLOCK_COLOR` / `BLOCK_TEXTURE` on the blocks.
 - Make bullets bigger/faster with `BULLET_SCALE` and `BULLET_SPEED`.
+- Shrink `MAG_SIZE` to 3 to feel why reloading matters.
+- Set `INFINITE_AMMO = True` for a relaxed "sandbox" mode.
 - Slow the mouse down with `MOUSE_SENSITIVITY`.
 
 ## Next steps to grow either project
-- Add enemy targets and detect hits.
-- Add a score counter and a simple HUD.
+- Make the game restartable instead of "press ESC to quit" on game over.
+- Give enemies different sizes/colours/speeds (a fast weak one, a slow tough one).
+- Drop an ammo or health pickup where an enemy dies.
 - Add textures to the raycaster walls (intermediate).
-- Add sound effects on shooting.
+- Make enemies shoot back.

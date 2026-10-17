@@ -1,13 +1,16 @@
 """
-world.py  --  Builds the level: the ground, the blocks, and the sky.
+world.py  --  Builds the level: the ground, the blocks, the sky, the enemies.
 
 We keep "building the map" separate from "the game objects" (entities.py)
-so that designing the level stays in one easy-to-find place.
+so that designing the level stays in one easy-to-find place:
+  build_world()   -- the scenery (ground, blocks, sky)
+  spawn_enemies() -- puts one Enemy on every spot in config.ENEMY_SPOTS
 """
 from ursina import Entity
 from ursina.prefabs.sky import Sky
 
 import config
+from entities import Enemy
 
 
 def build_world():
@@ -38,3 +41,15 @@ def build_world():
     Sky()
 
     return ground
+
+
+def spawn_enemies(target):
+    """Create one enemy per spot in config.ENEMY_SPOTS.
+
+    `target` is the Player -- every enemy needs to know who to chase.
+    We give back the list so the HUD can count how many are left.
+    """
+    enemies = []
+    for (x, z) in config.ENEMY_SPOTS:
+        enemies.append(Enemy(position=(x, config.ENEMY_Y, z), target=target))
+    return enemies

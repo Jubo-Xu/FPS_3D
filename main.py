@@ -6,13 +6,13 @@ main.py  --  The entry point. THIS is the file you run:
 It just wires the pieces together:
   1. (WSL fix) force software rendering if there's no graphics card.
   2. Create the ursina app + window.
-  3. Build the world, the player, and the crosshair.
+  3. Build the world, the player, the enemies, the crosshair and the HUD.
   4. Start the game loop.
 
 The actual details live in the other files:
   config.py  -- all the tweakable numbers
-  world.py     -- builds the level
-  entities.py  -- the Player, Gun and Bullet classes
+  world.py     -- builds the level + places the enemies
+  entities.py  -- the Player, Gun, Bullet, Enemy and HUD classes
 """
 import os
 
@@ -30,8 +30,8 @@ if not os.path.exists("/dev/dri"):
 from ursina import Ursina, window, application
 
 import config
-from world import build_world
-from entities import Player, Crosshair
+from world import build_world, spawn_enemies
+from entities import Player, Crosshair, HUD
 
 
 def main():
@@ -46,10 +46,15 @@ def main():
     window.fps_counter.enabled = config.SHOW_FPS
     window.exit_button.visible = False
 
-    # Build everything.
+    # Build everything. ORDER MATTERS a little here:
+    #   the enemies need the player (to chase), and
+    #   the HUD needs the player and the enemies (to count them).
     build_world()
-    Player()       # creating it is enough -- it wires itself into the game
+    player = Player()              # creating it wires it into the game
+    enemies = spawn_enemies(player)
     Crosshair()
+    if config.SHOW_HUD:
+        HUD(player, enemies)
 
     # Run the game until the window is closed.
     app.run()
