@@ -1,4 +1,31 @@
 {
     "python-envs.defaultEnvManager": "ms-python.python:conda",
-    "python-envs.defaultPackageManager": "ms-python.python:conda"
+    "python-envs.defaultPackageManager": "ms-python.python:conda",
+
+    // ---------------------------------------------------------------
+    // TEACHING MODE: no code suggestions, so the student types it out.
+    // Flip any of these back to the value in the comment when YOU are
+    // working on the game and want autocomplete again.
+    // ---------------------------------------------------------------
+    // Ghost text / whole-line AI completions:
+    "editor.inlineSuggest.enabled": false, // normally: true
+    "notebook.enhancedNextEditSuggestions.enabled": false, // normally: true
+    // IntelliCode's AI-ranked (starred) suggestions:
+    "vsintellicode.python.completionsEnabled": false, // normally: true
+    // The popup that appears while typing:
+    "editor.quickSuggestions": {
+        "other": false, // normally: "on"
+        "comments": false,
+        "strings": false
+    },
+    // The popup that appears after typing "." or "(":
+    "editor.suggestOnTriggerCharacters": false, // normally: true
+    // Don't let Enter silently accept a suggestion:
+    "editor.acceptSuggestionOnEnter": "off", // normally: "on"
+    // Don't suggest words copied from elsewhere in the file:
+    "editor.wordBasedSuggestions": "off", // normally: "matchingDocuments"
+    // Don't offer to auto-import modules:
+    "python.analysis.autoImportCompletions": false, // normally: false
+    // Parameter hints pop up over the cell while typing a call:
+    "editor.parameterHints.enabled": false // normally: true
 }
